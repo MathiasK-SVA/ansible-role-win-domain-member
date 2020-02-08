@@ -1,39 +1,39 @@
 ---
 # tasks file for ansible-role-win-domain-member
-- name: DNS Client
+- name: "set dns client IP address to {{ __dns_client_dns_server_ip }}"
   win_dns_client:
-    adapter_names: "{{ dns_client_adapter }}"
-    ipv4_addresses: "{{ dns_client_dns_server_ip }}"
-  when: dns_client_configure
+    adapter_names: "{{ __dns_client_adapter }}"
+    ipv4_addresses: "{{ __dns_client_dns_server_ip }}"
+  when: __dns_client_configure
 
-- name: Domain Member
+- name: "join domain {{ __dns_domain_name }}"
   win_domain_membership:
-    dns_domain_name: "{{ dns_domain_name }}"
-    hostname: "{{ hostname }}"
-    domain_admin_user: "{{ domain_admin_user }}"
-    domain_admin_password: "{{ domain_admin_password }}"
-    domain_ou_path: "{{ domain_ou_path }}"
+    dns_domain_name: "{{ __dns_domain_name }}"
+    hostname: "{{ __hostname }}"
+    domain_admin_user: "{{ __domain_join_user }}"
+    domain_admin_password: "{{ __domain_join_password }}"
+    domain_ou_path: "{{ __domain_ou_path }}"
     state: domain
   register: domain_state_ou
   when: domain_ou_path is defined
 
-- name: Domain Member
+- name: "join domain {{ __dns_domain_name }}"
   win_domain_membership:
-    dns_domain_name: "{{ dns_domain_name }}"
+    dns_domain_name: "{{ __dns_domain_name }}"
     hostname: "{{ hostname }}"
-    domain_admin_user: "{{ domain_admin_user }}"
-    domain_admin_password: "{{ domain_admin_password }}"
+    domain_admin_user: "{{ __domain_join_user }}"
+    domain_admin_password: "{{ __domain_join_password }}"
     state: domain
   register: domain_state
   when: domain_ou_path is undefined
 
-- name: Reboot when Domain Member requires it
+- name: Reboot when domain join requires it
   win_reboot:
   when:
     - domain_ou_path is undefined 
     - domain_state.reboot_required
 
-- name: Reboot (OU) when Domain Member requires it
+- name: Reboot when domain join (with OU) requires it
   win_reboot:
   when: 
     - domain_ou_path is defined
