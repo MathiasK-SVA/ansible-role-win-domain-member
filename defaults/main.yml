@@ -6,5 +6,4 @@ __domain_join_user: administrator@domain.local
 __domain_join_password: vagrant
 __domain_ou_path: CN=Computers,DC=domain,DC=local
 __dns_client_configure: false
-__dns_client_adapter: Ethernet
 __dns_client_dns_server_ip: 192.168.2.1

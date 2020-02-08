@@ -1,5 +1,17 @@
 ---
 # tasks file for ansible-role-win-domain-member
+- name: Get network adapter name
+  win_shell: |
+    $output = (Get-NetIPConfiguration |Where-Object {$_.IPv4Address.IPAddress.Length -gt 0 }|Select-Object -First 1).InterfaceAlias
+    Write-Host $output -NoNewLine
+  register: nic_name
+  when: __dns_client_adapter is undefined
+
+- name: set __dns_client_adapter variable
+  set_fact:
+    __dns_client_adapter: '{{ nic_name.stdout }}'
+  when: nic_name.stdout is defined
+
 - name: 'set dns client IP address to {{ __dns_client_dns_server_ip }}'
   win_dns_client:
     adapter_names: '{{ __dns_client_adapter }}'
